@@ -1,15 +1,16 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from setuptools import setup
 
 setup(
     name='libfaketimefs',
-    version='0.0.4',
+    version='0.0.5',
     description='Dynamic faketimerc file using a FUSE filesystem',
     author='Raymond Butcher',
     author_email='ray.butcher@claranet.uk',
-    url='https://github.com/claranet/libfaketimefs',
+    url='https://github.com/chrisovalantise/libfaketimefs',
     license='MIT License',
+    python_requires='>=3.8',
     packages=(
         'libfaketimefs',
         'libfaketimefs.vendored',

@@ -12,14 +12,14 @@ from time import time
 from threading import Lock
 from stat import S_IFDIR, S_IFREG
 
-from vendored.fusepy.fuse import FuseOSError, LoggingMixIn, Operations
+from libfaketimefs.vendored.fusepy.fuse import FuseOSError, LoggingMixIn, Operations
 
 
-CONTROL_COMMAND = re.compile(' '.join((
-    r'(?P<ref>\d+)',
-    r'(?P<time1>\d+)',
-    r'(?P<time2>\d+)',
-    r'(?P<rate>\d+)',
+CONTROL_COMMAND = re.compile(b' '.join((
+    rb'(?P<ref>\d+)',
+    rb'(?P<time1>\d+)',
+    rb'(?P<time2>\d+)',
+    rb'(?P<rate>\d+)',
 )))
 
 Command = namedtuple('Command', 'ref, time1, time2, rate')
@@ -146,11 +146,11 @@ class Faketime(LoggingMixIn, Operations):
 
             command = self.faketime_control
             offset = calculate_offset(command)
-            return '{:+f}'.format(offset)
+            return '{:+f}'.format(offset).encode('ascii')
 
         if path == '/realtime':
 
-            return '{:.22f}'.format(time())
+            return '{:.22f}'.format(time()).encode('ascii')
 
         if path == '/status':
 
@@ -158,9 +158,9 @@ class Faketime(LoggingMixIn, Operations):
             fake_time = calculate_fake_time(command)
 
             if fake_time > command.time2:
-                return 'IDLE'
+                return b'IDLE'
             else:
-                return 'MOVING'
+                return b'MOVING'
 
         if path in self.temp_files:
 
