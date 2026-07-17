@@ -66,7 +66,7 @@ else:
     _libfuse_path = find_library('fuse')
 
 if not _libfuse_path:
-    raise EnvironmentError('Unable to find libfuse')
+    _libfuse = None
 else:
     _libfuse = CDLL(_libfuse_path)
 
@@ -305,7 +305,8 @@ class fuse_context(Structure):
         ('pid', c_pid_t),
         ('private_data', c_voidp)]
 
-_libfuse.fuse_get_context.restype = POINTER(fuse_context)
+if _libfuse is not None:
+    _libfuse.fuse_get_context.restype = POINTER(fuse_context)
 
 
 class fuse_operations(Structure):
@@ -428,6 +429,9 @@ class FUSE(object):
 
         This gives you access to direct_io, keep_cache, etc.
         '''
+
+        if _libfuse is None:
+            raise EnvironmentError('Unable to find libfuse')
 
         self.operations = operations
         self.raw_fi = raw_fi
@@ -588,6 +592,8 @@ class FUSE(object):
         assert retsize <= size, \
             'actual amount read %d greater than expected %d' % (retsize, size)
 
+        if isinstance(ret, str):
+            ret = ret.encode()
         data = create_string_buffer(ret, retsize)
         memmove(buf, data, retsize)
         return retsize

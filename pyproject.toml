@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "libfaketimefs"
+version = "0.0.5"
+description = "Dynamic faketimerc file using a FUSE filesystem"
+requires-python = ">=3.8"
+license = "MIT"
+authors = [
+  { name = "Raymond Butcher", email = "ray.butcher@claranet.uk" },
+]
+urls = { Homepage = "https://github.com/chrisovalantise/libfaketimefs" }
+
+[project.scripts]
+libfaketimefs = "libfaketimefs.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["libfaketimefs*"]
