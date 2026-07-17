@@ -11,6 +11,7 @@ SHELL := bash
 export GH_TOKEN
 export GITHUB_TOKEN
 export GITHUB_REPOSITORY
+export GITHUB_TAG
 
 ################
 # Python build #
@@ -20,13 +21,8 @@ PYTHON ?= python3
 UV ?= uv
 MOUNTPOINT ?= /rum/libfaketimefs
 
-NAME := libfaketimefs
-VERSION := 0.0.5
-
-DIST := dist/$(NAME)-$(VERSION).tar.gz dist/$(NAME)-$(VERSION)-py3-none-any.whl
 UV_TOOL_RUN := $(UV) run --no-project
-GITHUB_REPOSITORY ?= chrisovalantise/libfaketimefs
-GITHUB_TAG ?= v$(VERSION)
+GITHUB_REPOSITORY := chrisovalantise/libfaketimefs
 
 .PHONY: test
 test:
@@ -37,12 +33,12 @@ test:
 build:
 	$(UV) build
 
-.PHONY: upload
-upload: build
+.PHONY: push
+push: build
 	@test -n "$${GH_TOKEN:-$${GITHUB_TOKEN:-}}" || (echo "Set GH_TOKEN or GITHUB_TOKEN with repo write access" >&2; exit 1)
 	@token="$${GH_TOKEN:-$${GITHUB_TOKEN:-}}"; \
 	repo="$(GITHUB_REPOSITORY)"; \
-	tag="$(GITHUB_TAG)"; \
+	tag="$${GITHUB_TAG:-v$$($(UV) version --short)}"; \
 	api="https://api.github.com/repos/$${repo}"; \
 	upload_api="https://uploads.github.com/repos/$${repo}/releases"; \
 	release_json=$$(curl -fsS \
@@ -60,7 +56,7 @@ upload: build
 		echo "Using existing GitHub release $${repo}@$${tag}"; \
 	fi; \
 	release_id=$$(printf '%s' "$${release_json}" | $(PYTHON) -c 'import json,sys; print(json.load(sys.stdin)["id"])'); \
-	for artifact in $(DIST); do \
+	for artifact in dist/*; do \
 		name=$$(basename "$${artifact}"); \
 		echo "Uploading $${name}"; \
 		existing_asset_id=$$(curl -fsS \
@@ -81,6 +77,9 @@ upload: build
 			--data-binary @"$${artifact}" \
 			"$${upload_api}/$${release_id}/assets?name=$${name}" >/dev/null; \
 	done
+
+.PHONY: upload
+upload: push
 
 .PHONY: clean
 clean:

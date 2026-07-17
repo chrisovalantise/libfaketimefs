@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "libfaketimefs"
-version = "0.0.5"
+version = "1.0.0"
 description = "Dynamic faketimerc file using a FUSE filesystem"
 requires-python = ">=3.8"
 license = "MIT"
