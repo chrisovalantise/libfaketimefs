@@ -1,10 +1,8 @@
 *.pyc
 *.egg-info/
 .direnv/
+.venv/
 .vscode/
 build/
 dist/
 testmount/
-
-# Local-only GitHub release upload token/settings.
-.env.upload
